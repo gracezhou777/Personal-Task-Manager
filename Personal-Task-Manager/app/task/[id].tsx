@@ -2,12 +2,13 @@ import React, { useMemo } from 'react';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
 import { Text, Chip, Divider } from 'react-native-paper';
-import { mockTasks } from '../../src/mock/tasks';
+import { useTasks } from '../../src/context/TasksContext';
 
 export default function TaskDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { tasks } = useTasks();
 
-  const task = useMemo(() => mockTasks.find(t => t.id === id), [id]);
+  const task = useMemo(() => tasks.find(t => t.id === id), [id, tasks]);
 
   return (
     <View style={styles.container}>
