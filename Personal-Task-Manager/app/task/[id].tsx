@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
-import { Text, Chip, Divider } from 'react-native-paper';
+import { Text, Chip, Divider, Button } from 'react-native-paper';
 import { useTasks } from '../../src/context/TasksContext';
 
 export default function TaskDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const { tasks } = useTasks();
 
   const task = useMemo(() => tasks.find(t => t.id === id), [id, tasks]);
@@ -21,6 +22,9 @@ export default function TaskDetailScreen() {
           </Chip>
           <Divider />
           <Text variant="bodyLarge">{task.description}</Text>
+          <Button mode="contained" style={styles.editBtn} onPress={() => router.push({ pathname: '/task/[id]/edit', params: { id } })}>
+            Edit
+          </Button>
         </View>
       ) : (
         <Text variant="bodyLarge" style={styles.empty}>Task not found (id: {String(id)})</Text>
@@ -45,6 +49,10 @@ const styles = StyleSheet.create({
   badgePending: {
     alignSelf: 'flex-start',
     backgroundColor: '#fef9c3',
+  },
+  editBtn: {
+    alignSelf: 'flex-start',
+    marginTop: 8,
   },
   empty: {
     marginTop: 20,

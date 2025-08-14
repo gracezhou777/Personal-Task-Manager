@@ -9,9 +9,16 @@ export interface CreateTaskInput {
   status?: TaskStatus;
 }
 
+export interface EditTaskInput {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+}
+
 export interface TasksContextValue {
   tasks: Task[];
   addTask: (input: CreateTaskInput) => Task;
+  editTask: (id: string, changes: EditTaskInput) => Task | undefined;
 }
 
 const TasksContext = createContext<TasksContextValue | undefined>(undefined);
@@ -36,7 +43,22 @@ export function TasksProvider({ children }: PropsWithChildren) {
     return newTask;
   }, []);
 
-  const value = useMemo<TasksContextValue>(() => ({ tasks, addTask }), [tasks, addTask]);
+  const editTask = useCallback((id: string, changes: EditTaskInput): Task | undefined => {
+    let updated: Task | undefined;
+    setTasks(prev => prev.map(t => {
+      if (t.id !== id) return t;
+      updated = {
+        ...t,
+        title: changes.title !== undefined ? changes.title.trim() : t.title,
+        description: changes.description !== undefined ? changes.description.trim() : t.description,
+        status: changes.status ?? t.status,
+      };
+      return updated;
+    }));
+    return updated;
+  }, []);
+
+  const value = useMemo<TasksContextValue>(() => ({ tasks, addTask, editTask }), [tasks, addTask, editTask]);
 
   return (
     <TasksContext.Provider value={value}>{children}</TasksContext.Provider>
